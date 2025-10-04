@@ -107,7 +107,7 @@
             chatLog.scrollTop = chatLog.scrollHeight;
         }
 
-        const socket = new WebSocket('ws://localhost:8080/ws');
+        const socket = new WebSocket('ws://192.168.0.56:8080/ws');
 
         socket.addEventListener('open', () => {
             appendMessage('已连接到服务器。', 'system');

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"log"
-	"github.com/gin-gonic/gin"
 	"github.com/Met-String/AgentSquare/internal/gateway/handler"
+	"github.com/gin-gonic/gin"
+	"log"
 )
 
 func main() {
@@ -16,6 +16,12 @@ func main() {
 
 	// WebSocket Echo 网关
 	r.GET("/ws", handler.WsEchoHandler)
+
+	// 前端静态资源
+	gatewayAssets := handler.GatewayStaticHandler("./assets/gateway")
+	r.GET("/", gatewayAssets)
+	r.GET("/assets/gateway/*filepath", gatewayAssets)
+	r.NoRoute(gatewayAssets)
 
 	addr := ":8080"
 	log.Println("Gateway listening on", addr)

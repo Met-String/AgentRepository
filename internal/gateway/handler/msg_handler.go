@@ -1,11 +1,11 @@
 package handler
 
 import (
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"time"
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 )
 
 // WebSocket 升级器（演示用：放开跨域；生产环境请按需校验 Origin）
@@ -30,9 +30,9 @@ func WsEchoHandler(c *gin.Context) {
 	}()
 	// 基本的超时与心跳设置（可选，稳定连接）
 	const (
-		readLimit     = 1 << 20 // 1MB
-		pongWait      = 60 * time.Second
-		writeWait     = 10 * time.Second
+		readLimit = 1 << 20 // 1MB
+		pongWait  = 60 * time.Second
+		writeWait = 10 * time.Second
 	)
 	conn.SetReadLimit(readLimit)
 	_ = conn.SetReadDeadline(time.Now().Add(pongWait))
@@ -41,9 +41,9 @@ func WsEchoHandler(c *gin.Context) {
 		_ = conn.SetReadDeadline(time.Now().Add(pongWait))
 		return nil
 	})
-	
+
 	log.Printf("ws connected: %s", conn.RemoteAddr())
-	
+
 	// 简单读写回环：读到什么就打印并原样写回
 	for {
 		msgType, msg, err := conn.ReadMessage()
@@ -68,4 +68,16 @@ func WsEchoHandler(c *gin.Context) {
 		}
 	}
 	log.Printf("ws closed: %s", conn.RemoteAddr())
+}
+
+// GatewayStaticHandler 返回一个 Gin 处理器，用于将指定目录作为静态文件服务器暴露
+func GatewayStaticHandler(root string) gin.HandlerFunc {
+	fileServer := http.FileServer(http.Dir(root))
+	return func(c *gin.Context) {
+		requestedPath := c.Param("filepath")
+		originalPath := c.Request.URL.Path
+		c.Request.URL.Path = requestedPath
+		fileServer.ServeHTTP(c.Writer, c.Request)
+		c.Request.URL.Path = originalPath
+	}
 }
