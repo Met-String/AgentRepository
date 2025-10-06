@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -28,25 +29,46 @@ func WsEchoHandler(c *gin.Context) {
 	defer func() {
 		_ = conn.Close()
 	}()
-	// 基本的超时与心跳设置（可选，稳定连接）
+
+	// 基本的超时与心跳设置
 	const (
 		readLimit = 1 << 20 // 1MB
 		pongWait  = 60 * time.Second
 		writeWait = 10 * time.Second
+		heartBeat = 30 * time.Second
 	)
 	conn.SetReadLimit(readLimit)
 	_ = conn.SetReadDeadline(time.Now().Add(pongWait))
-	conn.SetPongHandler(func(string) error {
-		// 收到客户端 Pong 就延长读取期限
-		_ = conn.SetReadDeadline(time.Now().Add(pongWait))
+	conn.SetPongHandler(func(string) error { 
+		_ = conn.SetReadDeadline(time.Now().Add(pongWait)) // 收到客户端 Pong 就延长读取期限
 		return nil
 	})
+
+	wrLock := sync.Mutex{}
+	pingTicker := time.NewTicker(heartBeat)
+	done := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-pingTicker.C:
+				wrLock.Lock()
+				if err := conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(writeWait)); err != nil {
+					log.Println("ping error:", err)
+					wrLock.Unlock()
+					return
+				}
+				wrLock.Unlock()
+			case <-done:
+				return
+			}
+		}
+	}()
 
 	log.Printf("ws connected: %s", conn.RemoteAddr())
 
 	// 简单读写回环：读到什么就打印并原样写回
 	for {
-		msgType, msg, err := conn.ReadMessage()
+		msgType, msg, err := conn.ReadMessage() // 阻塞读
 		if err != nil {
 			// 客户端关闭/网络错误
 			log.Println("read error:", err)
@@ -61,12 +83,18 @@ func WsEchoHandler(c *gin.Context) {
 		}
 
 		// 回显
+		log.Println("回显！")
 		_ = conn.SetWriteDeadline(time.Now().Add(writeWait))
+		wrLock.Lock()
 		if err := conn.WriteMessage(msgType, msg); err != nil {
 			log.Println("write error:", err)
+			wrLock.Unlock()
 			break
 		}
+		wrLock.Unlock()
 	}
+	close(done)
+	pingTicker.Stop()
 	log.Printf("ws closed: %s", conn.RemoteAddr())
 }
 
