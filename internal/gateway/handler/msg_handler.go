@@ -1,13 +1,16 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/Met-String/AgentSquare/internal/gateway/hub"
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
+
 
 // WebSocket 升级器（演示用：放开跨域；生产环境请按需校验 Origin）
 var upgrader = websocket.Upgrader{
@@ -18,6 +21,10 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+// handler.go (只保留对 Hub 的调用)
+// 在包级别持有一个 hub
+var ws_hub = hub.NewHub()
+
 // WsEchoHandler 将 HTTP 连接升级为 WebSocket，并实现“打印并原样回显”
 func WsEchoHandler(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
@@ -26,11 +33,15 @@ func WsEchoHandler(c *gin.Context) {
 		log.Println("upgrade error:", err)
 		return
 	}
+
+	ws_hub.AddConn(conn)
 	defer func() {
 		_ = conn.Close()
+		ws_hub.RemoveConn(conn)
 	}()
+	log.Printf("ws connected: %s", conn.RemoteAddr())
 
-	// 基本的超时与心跳设置
+	// 基本的超时与心跳参数配置
 	const (
 		readLimit = 1 << 20 // 1MB
 		pongWait  = 60 * time.Second
@@ -38,12 +49,15 @@ func WsEchoHandler(c *gin.Context) {
 		heartBeat = 30 * time.Second
 	)
 	conn.SetReadLimit(readLimit)
+
+	// 持续Ping、Pong以维持连接
+	// 接收Pong
 	_ = conn.SetReadDeadline(time.Now().Add(pongWait))
 	conn.SetPongHandler(func(string) error { 
 		_ = conn.SetReadDeadline(time.Now().Add(pongWait)) // 收到客户端 Pong 就延长读取期限
 		return nil
 	})
-
+	// 发出Ping
 	wrLock := sync.Mutex{}
 	pingTicker := time.NewTicker(heartBeat)
 	done := make(chan struct{})
@@ -64,8 +78,6 @@ func WsEchoHandler(c *gin.Context) {
 		}
 	}()
 
-	log.Printf("ws connected: %s", conn.RemoteAddr())
-
 	// 简单读写回环：读到什么就打印并原样写回
 	for {
 		msgType, msg, err := conn.ReadMessage() // 阻塞读
@@ -82,17 +94,12 @@ func WsEchoHandler(c *gin.Context) {
 			log.Printf("recv (binary) from %s: %d bytes", conn.RemoteAddr(), len(msg))
 		}
 
-		// 回显
-		log.Println("回显！")
-		_ = conn.SetWriteDeadline(time.Now().Add(writeWait))
-		wrLock.Lock()
-		if err := conn.WriteMessage(msgType, msg); err != nil {
-			log.Println("write error:", err)
-			wrLock.Unlock()
-			break
+		// 在读循环中：
+		if msgType == websocket.TextMessage {
+			ws_hub.Broadcast(msg)
 		}
-		wrLock.Unlock()
 	}
+
 	close(done)
 	pingTicker.Stop()
 	log.Printf("ws closed: %s", conn.RemoteAddr())

@@ -99,26 +99,27 @@
         const chatInput = document.getElementById('chatInput');
         const sendButton = document.getElementById('sendButton');
 
+        // 为聊天栏新增一条聊天消息，并自动跳转到最底部。
         function appendMessage(text, type = 'user') {
-            const entry = document.createElement('div');
-            entry.className = `message ${type}`;
-            entry.textContent = text;
-            chatLog.appendChild(entry);
-            chatLog.scrollTop = chatLog.scrollHeight;
+            const entry = document.createElement('div') 
+            entry.className = `message ${type}`;  // 根据Type区分不同类型的消息，拓展性做的很好
+            entry.textContent = text; // 我相信textContent不是div独有的
+            chatLog.appendChild(entry); //非常经典的appendChild
+            chatLog.scrollTop = chatLog.scrollHeight;// 相当于有新消息时，直接自动拉到最低
         }
 
-        const socket = new WebSocket('ws://192.168.0.56:8080/ws');
+        const socket = new WebSocket('ws://192.168.0.56:8080/ws'); // 新建一个socket对象，大概。
 
-        socket.addEventListener('open', () => {
-            appendMessage('已连接到服务器。', 'system');
-            sendButton.disabled = false;
+        socket.addEventListener('open', () => { // 添加一堆监听器之open
+            appendMessage('已连接到服务器。', 'system');  // 哦，而且居然真的有system消息类型？
+            sendButton.disabled = false; // 连接之后是可以发送消息的，我相信后面有机制让它天然关闭。
         });
 
-        socket.addEventListener('message', (event) => {
-            appendMessage(event.data, 'server');
+        socket.addEventListener('message', (event) => { // 添加一堆监听器之message
+            appendMessage(event.data, 'server'); // 嗯...对于非用户自己发的消息...似乎是核心代码
         });
 
-        socket.addEventListener('close', () => {
+        socket.addEventListener('close', () => { //🟢2 // 
             appendMessage('连接已关闭。', 'system');
             sendButton.disabled = true;
         });
@@ -135,7 +136,6 @@
             }
             if (socket.readyState === WebSocket.OPEN) {
                 socket.send(text);
-                appendMessage(text, 'user');
                 chatInput.value = '';
                 chatInput.focus();
             } else {
