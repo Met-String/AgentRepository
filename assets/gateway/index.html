@@ -41,11 +41,13 @@
         .message {
             font-size: 14px;
             word-break: break-word;
+            white-space: pre-wrap; /* 保留换行和空格 */
         }
 
         .message.system {
             color: #666;
             font-style: italic;
+            white-space: pre-wrap; /* 保留换行和空格 */
         }
 
         .input-row {
@@ -85,7 +87,8 @@
     <section class="panel chat-panel">
         <div id="chatLog" class="chat-log"></div>
         <form id="chatForm" class="input-row" autocomplete="off">
-            <input id="chatInput" type="text" placeholder="输入消息" required />
+            <textarea id="chatInput" style="resize:none; height:60px; width: 100%;" required></textarea>
+            <!-- <input id="chatInput" type="text" placeholder="输入消息" required /> -->
             <button id="sendButton" type="submit">发送</button>
         </form>
     </section>
