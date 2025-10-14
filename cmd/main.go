@@ -3,13 +3,37 @@ package main
 import (
 	"log"
 	"net/http"
+	"strings"
+	"time"
 	"github.com/Met-String/AgentSquare/internal/gateway/handler"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 // 网关 负责托管静态资源、Chat WS通讯。
 func main() {
 	r := gin.Default()
+
+	// 自定义配置
+    r.Use(cors.New(cors.Config{
+        // AllowOrigins:     []string{"*"},  // 允许所有域
+        AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+        AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+        ExposeHeaders:    []string{"Content-Length"},
+		AllowOriginFunc: func(origin string) bool {
+			log.Println(origin)
+            return strings.HasPrefix(origin, "chrome-extension://"+"nkkmhmcligmldeppkbcjfegoekfmclhl")
+			// return true
+        },
+        AllowCredentials: true,
+        MaxAge: 12 * time.Hour,
+    }))
+
+	// r.Use(func(c *gin.Context) {
+	// 	user_agent := c.GetHeader("user-agent")
+	// 	log.Println("user-agent:", user_agent)
+	// })
+
 	// 健康检查
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"ok": true})

@@ -111,7 +111,7 @@
             chatLog.scrollTop = chatLog.scrollHeight;// 相当于有新消息时，直接自动拉到最低
         }
 
-        const socket = new WebSocket('ws://192.168.0.56:8080/ws'); // 新建一个socket对象，大概。
+        const socket = new WebSocket('ws://qd2.mossfrp.cn:33331/ws'); // 新建一个socket对象，大概。
 
         socket.addEventListener('open', () => { // 添加一堆监听器之open
             appendMessage('已连接到服务器。', 'system');  // 哦，而且居然真的有system消息类型？
