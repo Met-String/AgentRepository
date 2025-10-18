@@ -2,11 +2,12 @@ package main
 
 import (
 	"log"
-	"net/http"
+	// "net/http"
 	"strings"
 	"time"
 	gateway_handler "github.com/Met-String/AgentSquare/internal/gateway/handler"
 	extension_handler "github.com/Met-String/AgentSquare/internal/extension_observer/handler"
+	resume_handler "github.com/Met-String/AgentSquare/internal/resume/handler"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -15,20 +16,19 @@ import (
 func main() {
 	r := gin.Default()
 
-	// 自定义配置
-    r.Use(cors.New(cors.Config{
-        // AllowOrigins:     []string{"*"},  // 允许所有域
-        AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-        AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-        ExposeHeaders:    []string{"Content-Length"},
-		AllowOriginFunc: func(origin string) bool {
-			log.Println(origin)
-            return strings.HasPrefix(origin, "chrome-extension://"+"nkkmhmcligmldeppkbcjfegoekfmclhl")
-			// return true
-        },
-        AllowCredentials: true,
-        MaxAge: 12 * time.Hour,
-    }))
+// 自定义配置
+r.Use(cors.New(cors.Config{
+	// AllowOrigins:     []string{"*"},  // 允许所有域
+	AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+	AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+	ExposeHeaders:    []string{"Content-Length"},
+	AllowOriginFunc: func(origin string) bool {
+		log.Println(origin)
+		return strings.HasPrefix(origin, "chrome-extension://"+"nkkmhmcligmldeppkbcjfegoekfmclhl")
+	},
+	AllowCredentials: true,
+	MaxAge: 12 * time.Hour,
+}))
 
 	// r.Use(func(c *gin.Context) {
 	// 	user_agent := c.GetHeader("user-agent")
@@ -44,10 +44,14 @@ func main() {
 	r.GET("/ws", gateway_handler.WsEchoHandler)
 	// 前端静态资源
 	gatewayAssets := gateway_handler.GatewayStaticHandler("./assets/gateway")
-	r.GET("/", func(c *gin.Context) {
-		c.Redirect(http.StatusFound, "/assets/gateway/index.html")
-	})
+	// r.GET("/", func(c *gin.Context) {
+	// 	c.Redirect(http.StatusFound, "/assets/gateway/index.html")
+	// })
 	r.GET("/assets/gateway/*filepath", gatewayAssets)
+
+	// ==========[简历]==========
+	resumeAssets := resume_handler.ResumeStaticHandler("./assets/resume", "/resume/")
+	r.GET("/resume//*filepath", resumeAssets)
 
 	// ==========[浏览器拓展打点监听]==========
 	r.POST("/extension", extension_handler.ExtensionEventHandler)

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume</title>
+    <style>
+        body {
+            margin: 0; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+
+        .top-bar,
+        .bottom-bar {
+            width: 100%;
+            padding: 20px 0;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+        }
+
+        .content-wrapper {
+            width: 100%;
+            max-width: 960px; /* 但是最大宽度不得超过960px */
+            padding: 40px 20px; /* 上下、左右 */
+            display: grid; /* 网格布局容器 元素按照行列自动排列 */
+            grid-template-columns: repeat(1, 1fr); /* 把网格分成 2 列， 每列宽度都是 1fr（平均分配剩余空间）。*/
+            gap: 20px; /* 网格或弹性布局里，每个格子之间的间距是 20px */
+            flex: 1;  /* 在弹性布局（flex 容器）里，这个元素会自动占满剩余空间。只有在父元素是 display: flex 时才生效*/
+            box-sizing: border-box; /* 元素的宽高包含内边距（padding）和边框（border）也就是说，width 不再只是内容区，而是整个盒子总宽度。 */
+        }
+
+        .content-section {
+            min-height: 150px;
+            border-radius: 8px;
+        }
+
+        /* 1) 建一个全局排版基准，避免浏览器乱猜 */
+        html {
+            text-size-adjust: 180%;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar"></div>
+    <main class="content-wrapper">
+        <div class="content-section">
+            <section>
+                <h4>唐泓博(Tang HongBo)，男，2000.08.27</h4>
+                <p>2020.09-2024.07 本科 天津理工大学 计算机科学与技术</p>
+                <p>NanYang, HeNan, China</p>
+                <p>Phone: (+86) 15237738336 | Email: superstringtheory@foxmail.com</p>
+                <!-- <p>Personal Website: <a href="http://qd2.mossfrp.cn:33331/resume/">http://qd2.mossfrp.cn:33331/resume/</a></p> -->
+                <p>GitHub: <a href="https://github.com/Met-String">https://github.com/Met-String</a></p>
+            </section>
+        </div>
+        <div class="content-section">
+            <section>
+            <h2>专业技能</h2>
+                <ul>
+                    <li>开发语言：GoLang, C, Lua, JavaScript, Bash</li>
+                    <li>服务端：Gin, Skynet</li>
+                    <li>前端：Vue.js, Chrome Extension</li>
+                    <li>数据库：MySQL, MongoDB, Redis</li>
+                    <li>版本管理：Svn, Git</li>
+                    <li>容器化：Docker</li>
+                    <li>操作系统：EndeavorOS</li>
+                </ul>
+            </section>
+        </div>
+        <div class="content-section">
+            <section>
+                <h2>职业经历</h2>
+                <h3>天津心智互动有限公司</h3>
+                <p>游戏服务端开发工程师（2024.08 ~ 2025.05）</p>
+                <p>业务技术：Skynet, MongoDB, Redis</p>
+                <p>参与盲人游戏《爱说笑空间交互》、《荣耀战场》的开发维护。</p>
+                <p>接手《爱说笑空间交互》的网球竞赛游戏版本的服务器开发，制作了装备、Buff、人物属性成长等系统，以及一些音频小游戏。</p>
+                <ul>
+                    <li>爱说笑空间交互 是场景模拟的沙盒游戏，通过双声道音频引导盲人玩家在简单的沙盒空间内活动、游戏。</li>
+                    <li>游戏内置于国内知名盲人社群《心智爱说笑》应用内。</li>
+                    <li>版本上线后每日活跃玩家数量由几人增长至一百五十余人。（盲人玩家群体规模较小）</li>
+                </ul>
+                <p>参与《荣耀战场》重制版的服务器开发，制作了排行榜、全服聊天、私聊、系统消息等。</p>
+                <ul>
+                    <li>荣耀战场 是枪战模拟的 PVP&PVE 游戏，通过音频引导盲人玩家在平面地图内行动、射击。</li>
+                    <li>玩家录制的视频：<a href="https://www.bilibili.com/video/BV1bu88z9EwY">https://www.bilibili.com/video/BV1bu88z9EwY</a></li>
+                </ul>
+            </section>
+            <section>
+                <h3>天津三立合创科技有限公司</h3>
+                <p>实习后端开发（2023.10 ~ 2024.02）</p>
+                <p>业务技术：SpringBoot, MySQL, Redis</p>
+                <p>以实习生身份参与《兴业铜业管理平台》的开发。负责了订单转工单部分关系型数据库设计、API编写。</p>
+                <ul>
+                    <li>外包项目，用于兴业铜业有限公司工厂内部铜材加工生产流程的管理。</li>
+                </ul>
+            </section>
+        </div>
+        <div class="content-section">
+            <h2>开源项目</h2>
+            <ul>
+                <li>
+                    <p>BilBili BookMark 
+                        <a href="https://github.com/Met-String/BiliBiili_BookMark">GitHub</a>
+                        <span> | </span>
+                        <a href="https://microsoftedge.microsoft.com/addons/detail/bilibili-%E8%A7%86%E9%A2%91%E4%B9%A6%E7%AD%BE/ndopjfbjkoamfkemglhmeljkmmnlcopc">拓展商城</a>
+                    </p>
+                    <p>Chrome浏览器拓展，用于外置的B站视频收藏、进度追踪。</p>
+                </li>
+            </ul>
+        </div>
+        <div class="content-section">
+            <h2>博客</h2>
+            <p>监修中...</p>
+        </div>
+        <div class="content-section">
+            <h2>其它</h2>
+            <p>英文CET4，可不借助翻译工具阅读英文技术文档</p>
+        </div>
+    </main>
+    <div class="bottom-bar"> 
+</div>
+</body>
+</html>
