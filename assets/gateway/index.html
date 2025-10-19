@@ -147,6 +147,16 @@
         });
 
         sendButton.disabled = socket.readyState !== WebSocket.OPEN;
+
+        // ====================
+        // [回车发送/回车+Shift换行]
+        chatInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();  // 阻止换行
+            chatForm.dispatchEvent(new Event('submit')); // 触发表单提交
+        }
+        });
+        // ====================
     </script>
 </body>
 </html>
