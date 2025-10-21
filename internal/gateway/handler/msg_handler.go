@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"sync"
 	"time"
-
 	"github.com/Met-String/AgentSquare/internal/gateway/hub"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"

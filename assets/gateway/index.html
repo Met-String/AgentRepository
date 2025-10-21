@@ -131,8 +131,8 @@
             appendMessage('连接出现错误。', 'system');
         });
 
-        chatForm.addEventListener('submit', (event) => {
-            event.preventDefault();
+        chatForm.addEventListener('submit', (event) => { 
+            event.preventDefault();// 🟢2
             const text = chatInput.value.trim();
             if (!text) {
                 return;
@@ -153,7 +153,7 @@
         chatInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();  // 阻止换行
-            chatForm.dispatchEvent(new Event('submit')); // 触发表单提交
+            chatForm.requestSubmit();
         }
         });
         // ====================
