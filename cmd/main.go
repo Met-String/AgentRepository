@@ -43,15 +43,15 @@ r.Use(cors.New(cors.Config{
 	// WebSocket Echo 网关
 	r.GET("/ws", gateway_handler.WsEchoHandler)
 	// 前端静态资源
-	gatewayAssets := gateway_handler.GatewayStaticHandler("./assets/gateway")
+	gatewayAssets := gateway_handler.GatewayStaticHandler("./assets/gateway_vue3/dist", "/assets/gateway/")
 	// r.GET("/", func(c *gin.Context) {
 	// 	c.Redirect(http.StatusFound, "/assets/gateway/index.html")
 	// })
-	r.GET("/assets/gateway/*filepath", gatewayAssets)
+	r.GET("/assets/gateway//*filepath", gatewayAssets)
 
 	// ==========[简历]==========
 	resumeAssets := resume_handler.ResumeStaticHandler("./assets/resume", "/resume/")
-	r.GET("/resume//*filepath", resumeAssets)
+	r.GET("/resume/*filepath", resumeAssets)
 
 	// ==========[浏览器拓展打点监听]==========
 	r.POST("/extension", extension_handler.ExtensionEventHandler)

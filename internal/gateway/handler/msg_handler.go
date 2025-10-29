@@ -105,13 +105,9 @@ func WsEchoHandler(c *gin.Context) {
 }
 
 // GatewayStaticHandler 返回一个 Gin 处理器，用于将指定目录作为静态文件服务器暴露
-func GatewayStaticHandler(root string) gin.HandlerFunc {
-	fileServer := http.FileServer(http.Dir(root))
+func GatewayStaticHandler(root string, prefix string) gin.HandlerFunc {
+	fileServer := http.StripPrefix(prefix, http.FileServer(http.Dir(root)))
 	return func(c *gin.Context) {
-		requestedPath := c.Param("filepath")
-		originalPath := c.Request.URL.Path
-		c.Request.URL.Path = requestedPath
 		fileServer.ServeHTTP(c.Writer, c.Request)
-		c.Request.URL.Path = originalPath
 	}
 }
