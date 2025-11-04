@@ -1,14 +1,14 @@
 <template>
-  <form class="input-row" @submit.prevent="handleSubmit">
+  <form class="input-row" @submit.prevent="handleSubmit"> 
     <textarea
-      ref="textarea"
+      ref="textarea" 
       v-model="text"
       class="chat-input"
       placeholder="输入消息"
       @keydown="handleKeydown"
       @input="autoResize"
       rows="1"
-      required
+      required 
     ></textarea>
     <button type="submit">发送</button>
   </form>
